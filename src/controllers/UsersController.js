@@ -2,7 +2,12 @@
 const  { hash, compare } = require("bcryptjs"); //hash para criptografar a senha, e, compare pra usar na hora de comparar a senha antiga digitada com a que está no banco criptografada na ocasião de alteração de senha
 
 const AppError= require("../utils/AppError");
+
+const UserRepository = require("../repositories/UserRepository");  //importando a lógica do BD que está nesse arquivo
+
 const sqliteConnection = require('../database/sqlite');
+
+const UserCreateService = require("../services/UserCreateService"); //importando a regra de negócio  da criação do usuário
 /**********************************************************************************************/ 
 
 class UsersController {
@@ -10,20 +15,12 @@ class UsersController {
   async create(request, response) {
     const { name, email, password } = request.body; //capturando os dados
 
-    const database = await sqliteConnection(); //nomeando meu BD, criando uma constante que receberá a conexão com meu BD. Uso await há demora trata-se de conexão.
-    const checkUserExists = await database.get("SELECT * FROM users WHERE email = (?)", [email]) // a interrogação será substituída pela variável 
+    const userRepository = new UserRepository(); //instanciando a classe UserRepository da lógica do BD
+    const userCreateService = new UserCreateService(userRepository); //instanciando a classe UserCreateService da lógica da criação do usuário (uma regra de negócio)
+
+    await userCreateService.execute({ name, email, password });
     
-    if(checkUserExists) {
-      throw new AppError("Este email já encontra-se em uso.");
-    }
-
-    const hashedPassword = await hash(password, 8); //senha e fator de complexidade //Como ese método é uma promise preciso usar o await
-
-    //executando uma inserção, conforme os campos e valores 
-    await database.run("INSERT INTO users (name, email, Password) VALUES (?, ?, ?)", [name, email, hashedPassword]);
-
     return response.status(201).json();
-
   }
 
   //função para atualizar dados
