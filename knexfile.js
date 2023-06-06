@@ -24,7 +24,7 @@ arquivo igual fizemos na migrations da pasta sqlite, pois
 as do knex são gerenciadas pelo próprio knex.
 Nesse passo, colocamos em nossa API, no terminal o código
 npx knex migrate:make createNotes (nome dessa migrate),
-como vou ceriar a tabela de notas dei esse nome, dei enter
+como vou criar a tabela de notas dei esse nome, dei enter
 e dentro da pasta migrations esse arquivo da tabela de Notas.
 Nesse arquivo que surgiu também vou apagar algumas coisas.
 Deixo só os comandos UP e Down. Segue pra lá agora ->
